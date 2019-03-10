@@ -13,7 +13,6 @@ import {
 
 export default class PingpongRenderTarget {
 
-    
     constructor(width, height, material, data = null) {
 
         this.width = width,
@@ -41,10 +40,8 @@ export default class PingpongRenderTarget {
 
         let tex = new DataTexture(data, w, h, RGBAFormat, FloatType)
         tex.needsUpdate = true;
-        // tex.wrapS = tex.wrapT = RepeatWrapping
         rt_a.texture = tex.clone()
         rt_b.texture = tex;
-
 
         this.material = material        
         this.material.uniforms["input_texture"] = {value: this.texture};
