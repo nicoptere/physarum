@@ -17,7 +17,8 @@ import dat from "dat.gui";
 import Controls from "./src/Controls";
 
 
-
+// 0 configure scene
+//////////////////////////////////////
 
 let w = window.innerWidth
 let h = window.innerHeight
