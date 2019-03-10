@@ -1,0 +1,28 @@
+{
+  "name": "physarum",
+  "version": "0.0.0",
+  "description": "slime mold simulation",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "file-loader": "^3.0.1",
+    "raw-loader": "^1.0.0",
+    "webpack": "^4.29.0",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.8",
+    "three": "0.102.1",
+    "dat.gui": "0.7.5"
+  },
+  "scripts": {
+    "dev": "webpack && webpack-dev-server",
+    "deploy": "webpack -p --config webpack.config.js"
+  },
+  "keywords": [
+    "physarum",
+    "simulation",
+    "gpgpu",
+    "slime mold"
+  ],
+  "author": "nicolas barradeau",
+  "license": "ISC"
+}
