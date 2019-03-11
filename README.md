@@ -24,7 +24,6 @@ how to:
 then build with 
 > `npm run deploy`
 
-
 sample images:
 
 ![img0](img/img0.png)

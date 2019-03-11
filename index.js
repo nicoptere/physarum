@@ -35,14 +35,14 @@ camera.position.z = 1
 // 1 init buffers 
 //////////////////////////////////////
 
-let size = 256 // particles amount = ( size ^ 2 )
+let size = 512 // particles amount = ( size ^ 2 )
 
 let count = size * size;
 let pos = new Float32Array(count * 3)
 let uvs = new Float32Array(count * 2)
 let ptexdata = new Float32Array(count * 4)
-let infodata = new Float32Array(count * 4)
-let id = 0, x,y, u,v;
+
+let id = 0, u,v;
 for (let i = 0; i < count; i++) {
 
     //point cloud vertex 
@@ -57,20 +57,12 @@ for (let i = 0; i < count; i++) {
     uvs[id] = v
 
     //particle texture values (agents)
-    x = Math.random()
-    y = Math.random()
     id = i * 4
-    ptexdata[id++] = x//u//
-    ptexdata[id++] = y//v//
-    ptexdata[id++] = Math.random() //angle
+    ptexdata[id++] = Math.random() // normalized pos x
+    ptexdata[id++] = Math.random() // normalized pos y
+    ptexdata[id++] = Math.random() // normalized angle
     ptexdata[id++] = 1
     
-    //extra data for particles
-    id = i * 4
-    infodata[id++] = 0
-    infodata[id++] = 0
-    infodata[id++] = 0
-    infodata[id++] = 0
 
 }
 
@@ -81,7 +73,7 @@ for (let i = 0; i < count; i++) {
 let diffuse_decay = new ShaderMaterial({
     uniforms: {
         points: { value: null },
-        decay: {value: .8 }        
+        decay: {value: .9 }        
     },
     vertexShader: require('./src/glsl/quad_vs.glsl'),
     fragmentShader: require('./src/glsl/diffuse_decay_fs.glsl')
@@ -96,19 +88,15 @@ let trails = new PingpongRenderTarget(w, h, diffuse_decay)
 let update_agents = new ShaderMaterial({
     uniforms: {
         data: { value: null },
-        info: { value: null },
-        sa: { value: 22.5 },
-        ra: { value: 21 },
-        so: { value: 9 },
-        ss: { value: 2.5 }
+        sa: { value: 2 },
+        ra: { value: 4 },
+        so: { value: 12 },
+        ss: { value: 1.1 }
     },
     vertexShader: require('./src/glsl/quad_vs.glsl'),
     fragmentShader: require('./src/glsl/update_agents_fs.glsl')
 })
 let agents = new PingpongRenderTarget(size, size, update_agents, ptexdata)
-//extra data for agents ( per agent variables)
-let info = new DataTexture(infodata, size, size, RGBAFormat, FloatType)
-info.needsUpdate = true;
 
 
 // 4 point cloud
@@ -116,11 +104,6 @@ info.needsUpdate = true;
 
 //renders the updated agents as red dots 
 let render_agents = new ShaderMaterial({
-    uniforms: {
-        tex: { value: null }, 
-        col: { value: 0 },
-        pointSize: { value: 1 }
-    },
     vertexShader: require('./src/glsl/render_agents_vs.glsl'),
     fragmentShader: require('./src/glsl/render_agents_fs.glsl')
 })
@@ -130,7 +113,7 @@ let render = new RenderTarget(w,h,render_agents, pos, uvs)
 // 5 post process
 //////////////////////////////////////
 
-//post process the result of the trails 
+//post process the result of the trails (render the trails as greyscale)
 let postprocess = new ShaderMaterial({
     uniforms: {
         data: {
@@ -148,6 +131,7 @@ scene.add(postprocess_mesh)
 // 6 interactive controls 
 //////////////////////////////////////
 let controls = new Controls( renderer, agents )
+controls.count = ~~(size * size * .05)
 
 
 // animation loop 
@@ -163,14 +147,14 @@ function raf(){
     trails.render( renderer, time )
     
     agents.material.uniforms.data.value = trails.texture
-    agents.material.uniforms.info.value = info
     agents.render(renderer, time)
-
+    
     render.render( renderer, time )
     
 
     renderer.setSize(w,h)
     renderer.clear()
+    
     postprocess_mesh.material.uniforms.data.value = trails.texture
     renderer.render(scene, camera)
 }
@@ -188,7 +172,6 @@ let time = 0;
 
 raf()
 
-
 // settings
 //////////////////////////////////////////////////
 
@@ -198,6 +181,7 @@ gui.add(update_agents.uniforms.sa, "value", 1, 90, .1).name("sa")
 gui.add(update_agents.uniforms.ra, "value", 1, 90, .1).name("ra")
 gui.add(update_agents.uniforms.so, "value", 1, 90, .1).name("so")
 gui.add(update_agents.uniforms.ss, "value", 0.1, 10, .1).name("ss")
-gui.add(controls, "reset")
-gui.add(controls, "radius",.001,.1)
+gui.add(controls, "random")
+gui.add(controls, "radius",.001,.25)
+gui.add(controls, "count", 1,size*size, 1)
 

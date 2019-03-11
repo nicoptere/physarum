@@ -12,6 +12,7 @@ export default class Controls {
         this.size = new Vector2()
         
         this.radius = .025;
+        this.count = 50;
 
         let container = renderer.domElement;
         container.addEventListener("mouseup", this.onUp.bind(this))
@@ -23,16 +24,16 @@ export default class Controls {
 
     onDown(e) {
         isDown = true
-        this.addParticles(e, 250)
+        this.addParticles(e)
     }
 
     onDoubleClick(e) {
         
-        let r = this.radius
-        this.radius = .075
-        this.addParticles(e, this.agents.texture.image.data.length / 4 )
-        this.radius = r
-        console.log( "hpop")
+        let c = this.count
+        this.count = -1
+        this.addParticles(e )
+        this.count = c
+        
     }
 
     onUp(e) {
@@ -45,7 +46,13 @@ export default class Controls {
         }
     }
 
-    addParticles(e, count = 50) {
+    addParticles(e) {
+
+        let count = this.count
+        if(this.count == -1 ){
+            count = this.agents.texture.image.data.length / 4
+        }
+
         this.renderer.getSize(this.size)
         let w = this.size.width
         let h = this.size.height
@@ -71,7 +78,7 @@ export default class Controls {
         this.renderer.copyTextureToTexture(new Vector2(0, 0), tex, tex);
     }
 
-    reset() {
+    random() {
         pid = 0;
         let tex = this.agents.texture
         let arr = tex.image.data

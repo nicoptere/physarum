@@ -17,20 +17,20 @@ void main(){
     const float dim = 1.;
 
     //weight
-    float div = 1. / pow( 2. * dim + 1., 2. );
+    float weight = 1. / pow( 2. * dim + 1., 2. );
 
     for( float i = -dim; i <= dim; i++ ){
     
         for( float j = -dim; j <= dim; j++ ){
     
             vec3 val = texture2D( input_texture, fract( vUv+res*vec2(i,j) ) ).rgb;
-            col += val.r*div + val.g * div;
+            col += val.r * weight + val.g * weight * .5;
 
         }
     }
 
     vec4 fin = vec4( pos * decay, col * decay, .5, 1. );
-    gl_FragColor = clamp( fin, 0., 1. );
+    gl_FragColor = clamp( fin, 0.01, 1. );
     
 
 }
