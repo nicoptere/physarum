@@ -29,7 +29,7 @@ const renderer = new WebGLRenderer({
 document.body.appendChild(renderer.domElement);
 renderer.setSize(w, h);
 const scene = new Scene();
-let camera = new OrthographicCamera(-w / 2, w / 2, h / 2, -h / 2, 0.1, 100);
+const camera = new OrthographicCamera(-w / 2, w / 2, h / 2, -h / 2, 0.1, 100);
 camera.position.z = 1
 
 // 1 init buffers 
@@ -151,12 +151,11 @@ function raf(){
     
     render.render( renderer, time )
     
-
+    postprocess_mesh.material.uniforms.data.value = trails.texture
     renderer.setSize(w,h)
     renderer.clear()
-    
-    postprocess_mesh.material.uniforms.data.value = trails.texture
     renderer.render(scene, camera)
+    
 }
 
 //////////////////////////////////////////////////
